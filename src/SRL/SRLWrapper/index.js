@@ -211,25 +211,19 @@ const SRLWrapper = ({
                 handleAttachListener(e, element, handleElement)
                 return element
               }
-              case GALLERY_IMAGE: {
+              case GALLERY_IMAGE: {                
+                // If <img> is wrapped in <a>, then <img> src is thumbnail and <a> href is source.
+                // If <img> is not wrapped, then <img> src is both thumbnail and source.
+                // N.B. Gatsby and NextJS insert elements around <img>.
+                const parentLinkElement = e.closest("a");
+                const thumbnailUrl = e.src || e.currentSrc;
+                const sourceUrl = parentLinkElement ? parentLinkElement.href : thumbnailUrl;
+
                 const element = {
                   id: e.getAttribute('srl_elementid'),
-                  source:
-                    e.parentElement.href ||
-                    e.offsetParent.parentElement.href ||
-                    e.offsetParent.href ||
-                    e.parentElement.parentElement.parentElement.href || // UGLY FIX FOR GATSBY
-                    e.src ||
-                    e.currentSrc ||
-                    null,
+                  source: sourceUrl,
                   caption: e.alt || e.textContent,
-                  thumbnail:
-                    e.parentElement.href ||
-                    e.offsetParent.parentElement.href ||
-                    e.offsetParent.href ||
-                    e.parentElement.parentElement.parentElement.href || // UGLY FIX FOR GATSBY
-                    e.src ||
-                    e.currentSrc,
+                  thumbnail: thumbnailUrl,
                   width: null,
                   height: null,
                   type: 'gallery_image'
